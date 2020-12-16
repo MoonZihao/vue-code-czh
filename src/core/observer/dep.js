@@ -17,13 +17,15 @@ export default class Dep {
 
   constructor () {
     this.id = uid++
-    this.subs = []
+    this.subs = [] // 订阅者列表
   }
 
+  // 添加订阅
   addSub (sub: Watcher) {
     this.subs.push(sub)
   }
 
+  // 删除订阅
   removeSub (sub: Watcher) {
     remove(this.subs, sub)
   }

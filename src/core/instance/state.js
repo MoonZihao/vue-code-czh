@@ -51,7 +51,8 @@ export function initState (vm: Component) {
   if (opts.props) initProps(vm, opts.props)
   if (opts.methods) initMethods(vm, opts.methods)
   if (opts.data) {
-    initData(vm)
+    console.log("initState--data", vm);
+    initData(vm) // 初始化data
   } else {
     observe(vm._data = {}, true /* asRootData */)
   }
@@ -147,7 +148,7 @@ function initData (vm: Component) {
       proxy(vm, `_data`, key)
     }
   }
-  // observe data
+  // 监听 data
   observe(data, true /* asRootData */)
 }
 

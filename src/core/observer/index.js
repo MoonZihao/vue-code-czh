@@ -34,6 +34,7 @@ export function toggleObserving (value: boolean) {
  * object's property keys into getter/setters that
  * collect dependencies and dispatch updates.
  */
+// 监听器Observer
 export class Observer {
   value: any;
   dep: Dep;
@@ -61,6 +62,7 @@ export class Observer {
    * getter/setters. This method should only be called when
    * value type is Object.
    */
+  // 当为object时，递归遍历对象所有属性
   walk (obj: Object) {
     const keys = Object.keys(obj)
     for (let i = 0; i < keys.length; i++) {
@@ -108,11 +110,15 @@ function copyAugment (target: Object, src: Object, keys: Array<string>) {
  * or the existing observer if the value already has one.
  */
 export function observe (value: any, asRootData: ?boolean): Observer | void {
+  console.log("observe", value, asRootData);
+
+  // 不为object时结束
   if (!isObject(value) || value instanceof VNode) {
     return
   }
   let ob: Observer | void
   if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
+    // 当属性已经存在监听时，直接赋值
     ob = value.__ob__
   } else if (
     shouldObserve &&
@@ -121,6 +127,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
     Object.isExtensible(value) &&
     !value._isVue
   ) {
+    // 创建监听器Observer
     ob = new Observer(value)
   }
   if (asRootData && ob) {
@@ -132,6 +139,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
 /**
  * Define a reactive property on an Object.
  */
+// 为属性添加 Object.defineProperty
 export function defineReactive (
   obj: Object,
   key: string,
