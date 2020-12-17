@@ -136,10 +136,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
   return ob
 }
 
-/**
- * Define a reactive property on an Object.
- */
-// 为属性添加 Object.defineProperty
+// 封装Object.defineProperty，定义一个响应式属性
 export function defineReactive (
   obj: Object,
   key: string,
@@ -163,12 +160,13 @@ export function defineReactive (
 
   let childOb = !shallow && observe(val)
   Object.defineProperty(obj, key, {
-    enumerable: true,
-    configurable: true,
+    enumerable: true, // 是否可删除
+    configurable: true, // 是否可被枚举
+    // getter收集依赖
     get: function reactiveGetter () {
       const value = getter ? getter.call(obj) : val
       if (Dep.target) {
-        dep.depend()
+        dep.depend() // 添加依赖
         if (childOb) {
           childOb.dep.depend()
           if (Array.isArray(value)) {
@@ -178,6 +176,7 @@ export function defineReactive (
       }
       return value
     },
+    // setter触发依赖
     set: function reactiveSetter (newVal) {
       const value = getter ? getter.call(obj) : val
       /* eslint-disable no-self-compare */

@@ -23,7 +23,7 @@ let uid = 0
  * and fires callback when the expression value changes.
  * This is used for both the $watch() api and directives.
  */
-// 订阅者Watcher
+// 订阅者Watcher，当前收集的依赖
 export default class Watcher {
   vm: Component;
   expression: string;
@@ -45,8 +45,8 @@ export default class Watcher {
 
   constructor (
     vm: Component,
-    expOrFn: string | Function,
-    cb: Function,
+    expOrFn: string | Function, // 当前监听对象
+    cb: Function, // 回调函数
     options?: ?Object,
     isRenderWatcher?: boolean
   ) {
@@ -77,6 +77,7 @@ export default class Watcher {
       ? expOrFn.toString()
       : ''
     // parse expression for getter
+    console.log("expOrFn", expOrFn);
     if (typeof expOrFn === 'function') {
       this.getter = expOrFn
     } else {
