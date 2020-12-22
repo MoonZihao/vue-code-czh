@@ -6,8 +6,9 @@
 import { def } from '../util/index'
 
 const arrayProto = Array.prototype
-export const arrayMethods = Object.create(arrayProto)
+export const arrayMethods = Object.create(arrayProto) // 继承Array.prototype，具备Array.prototype所有功能
 
+// 需要封装的数组方法
 const methodsToPatch = [
   'push',
   'pop',
@@ -21,11 +22,14 @@ const methodsToPatch = [
 /**
  * Intercept mutating methods and emit events
  */
+// 拦截器
 methodsToPatch.forEach(function (method) {
   // cache original method
   const original = arrayProto[method]
+
+  // 使用Object.defineProperty封装push等方法
   def(arrayMethods, method, function mutator (...args) {
-    const result = original.apply(this, args)
+    const result = original.apply(this, args) // 执行原生Array.prototype上的方法
     const ob = this.__ob__
     let inserted
     switch (method) {
