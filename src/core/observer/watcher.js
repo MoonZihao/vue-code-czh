@@ -127,6 +127,7 @@ export default class Watcher {
   /**
    * Add a dependency to this directive.
    */
+  // 添加依赖
   addDep (dep: Dep) {
     const id = dep.id
     if (!this.newDepIds.has(id)) {

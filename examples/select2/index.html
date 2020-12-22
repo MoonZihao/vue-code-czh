@@ -25,7 +25,7 @@
     <!-- using string template here to work around HTML <option> placement restriction -->
     <script type="text/x-template" id="demo-template">
       <div>
-        <p>Selected: {{ selected }}</p>
+        <!-- <p>Selected: {{ selected }}</p> -->
         <!-- <select2 :options="options" v-model="selected">
           <option disabled value="0">Select one</option>
         </select2> -->
@@ -72,11 +72,17 @@
       el: '#el',
       template: '#demo-template',
       data: {
-        selected: 0,
-        options: [
-          { id: 1, text: 'Hello' },
-          { id: 2, text: 'World' }
-        ]
+        // selected: 0,
+        // options: [
+        //   { id: 1, text: 'Hello' },
+        //   { id: 2, text: 'World' }
+        // ]
+        testObj: {
+          aaa: {
+            bbb: "bbb"
+          },
+          // ccc: "ccc"
+        }
       },
       // watch: {
       //   selected: function(val, oldVal) {
