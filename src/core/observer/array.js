@@ -28,10 +28,10 @@ methodsToPatch.forEach(function (method) {
   const original = arrayProto[method]
 
   // 使用Object.defineProperty封装push等方法
-  def(arrayMethods, method, function mutator (...args) {
+  def(arrayMethods, method, function mutator (...args) { // mutator为value，array.push实际是执行mutator
     const result = original.apply(this, args) // 执行原生Array.prototype上的方法
-    const ob = this.__ob__
-    let inserted
+    const ob = this.__ob__ // 获取当前Observer实例
+    let inserted // 当前新增的元素
     switch (method) {
       case 'push':
       case 'unshift':
@@ -41,9 +41,9 @@ methodsToPatch.forEach(function (method) {
         inserted = args.slice(2)
         break
     }
-    if (inserted) ob.observeArray(inserted)
+    if (inserted) ob.observeArray(inserted) // 数组新增的元素遍历转换成响应式
     // notify change
-    ob.dep.notify()
+    ob.dep.notify() // 向依赖发送通知
     return result
   })
 })

@@ -44,8 +44,10 @@ export class Observer {
     this.value = value
     this.dep = new Dep()
     this.vmCount = 0
-    def(value, '__ob__', this)
+    def(value, '__ob__', this) // 新增一个不可枚举的属性__ob__，作用：1.标记属性是否为响应式，有__ob__代表属性为响应式的，2.获取当前Observer实例及里面保存的依赖。
     if (Array.isArray(value)) {
+
+      // 判断是否支持__proto__
       if (hasProto) {
         protoAugment(value, arrayMethods)
       } else {
@@ -110,7 +112,6 @@ function copyAugment (target: Object, src: Object, keys: Array<string>) {
  * or the existing observer if the value already has one.
  */
 export function observe (value: any, asRootData: ?boolean): Observer | void {
-  console.log("observe", value, asRootData);
 
   // 不为object时结束
   if (!isObject(value) || value instanceof VNode) {
@@ -118,7 +119,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
   }
   let ob: Observer | void
   if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
-    // 当属性已经存在监听时，直接赋值
+    // 当属性已经存在响应式监听时，直接赋值并返回
     ob = value.__ob__
   } else if (
     shouldObserve &&

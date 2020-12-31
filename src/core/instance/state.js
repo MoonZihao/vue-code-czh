@@ -51,7 +51,6 @@ export function initState (vm: Component) {
   if (opts.props) initProps(vm, opts.props)
   if (opts.methods) initMethods(vm, opts.methods)
   if (opts.data) {
-    console.log("initState--data", vm);
     initData(vm) // 初始化data
   } else {
     observe(vm._data = {}, true /* asRootData */)
@@ -354,7 +353,7 @@ export function stateMixin (Vue: Class<Component>) {
     }
     options = options || {}
     options.user = true
-    const watcher = new Watcher(vm, expOrFn, cb, options)
+    const watcher = new Watcher(vm, expOrFn, cb, options) // 实现vm.$watch基本功能
     if (options.immediate) {
       try {
         cb.call(vm, watcher.value)

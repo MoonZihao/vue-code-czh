@@ -77,7 +77,6 @@ export default class Watcher {
       ? expOrFn.toString()
       : ''
     // parse expression for getter
-    console.log("expOrFn", expOrFn);
     if (typeof expOrFn === 'function') {
       this.getter = expOrFn
     } else {
@@ -127,10 +126,10 @@ export default class Watcher {
   /**
    * Add a dependency to this directive.
    */
-  // 添加依赖
+  // 添加依赖，记录自己订阅了哪些Dep
   addDep (dep: Dep) {
     const id = dep.id
-    if (!this.newDepIds.has(id)) {
+    if (!this.newDepIds.has(id)) { // 防止重复订阅
       this.newDepIds.add(id)
       this.newDeps.push(dep)
       if (!this.depIds.has(id)) {
@@ -228,6 +227,7 @@ export default class Watcher {
   /**
    * Remove self from all dependencies' subscriber list.
    */
+  // 取消观察数据，把watcher实例从当前正在观察的状态的依赖Dep列表中移除
   teardown () {
     if (this.active) {
       // remove self from vm's watcher list

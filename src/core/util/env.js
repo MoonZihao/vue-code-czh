@@ -1,6 +1,7 @@
 /* @flow */
 
 // can we use __proto__?
+// 判断是否支持__proto__
 export const hasProto = '__proto__' in {}
 
 // Browser environment sniffing

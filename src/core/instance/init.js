@@ -37,13 +37,11 @@ export function initMixin (Vue: Class<Component>) {
       initInternalComponent(vm, options)
     } else {
       // 不为组件时，初始化$options
-      console.log("options", options);
       vm.$options = mergeOptions(
         resolveConstructorOptions(vm.constructor),
         options || {},
         vm
       )
-      console.log("vm.$options", vm.$options);
     }
     /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
