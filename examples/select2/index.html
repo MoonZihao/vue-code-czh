@@ -20,6 +20,10 @@
   <body>
 
     <div id="el">
+      <div v-for="item in items">
+        {{ item.message }}
+      </div>
+      <div @click="add">add</div>
     </div>
 
     <!-- using string template here to work around HTML <option> placement restriction -->
@@ -70,24 +74,20 @@
 
     var vm = new Vue({
       el: '#el',
-      template: '#demo-template',
       data: {
-        // selected: 0,
-        // options: [
-        //   { id: 1, text: 'Hello' },
-        //   { id: 2, text: 'World' }
-        // ]
-        // testObj: {
-        //   aaa: {
-        //     bbb: "bbb"
-        //   }
-        // }
+        items: [
+          { message: 'aaa' },
+          { message: 'bbb' }
+        ]
       },
-      // watch: {
-      //   selected: function(val, oldVal) {
-      //     console.log(val, oldVal);
-      //   }
-      // }
+      methods: {
+        add() {
+          this.items.push({
+            message: "ccc"
+          })
+          console.log("add");
+        }
+      }
     })
     </script>
   </body>

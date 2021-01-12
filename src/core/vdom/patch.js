@@ -96,6 +96,7 @@ export function createPatchFunction (backend) {
     return remove
   }
 
+  // 删除单个节点
   function removeNode (el) {
     const parent = nodeOps.parentNode(el)
     // element may have already been removed due to v-html / v-text
@@ -148,7 +149,7 @@ export function createPatchFunction (backend) {
     const data = vnode.data
     const children = vnode.children
     const tag = vnode.tag
-    if (isDef(tag)) {
+    if (isDef(tag)) { // 有tag属性时为元素节点
       if (process.env.NODE_ENV !== 'production') {
         if (data && data.pre) {
           creatingElmInVPre++
@@ -198,10 +199,10 @@ export function createPatchFunction (backend) {
       if (process.env.NODE_ENV !== 'production' && data && data.pre) {
         creatingElmInVPre--
       }
-    } else if (isTrue(vnode.isComment)) {
+    } else if (isTrue(vnode.isComment)) { // 注释节点
       vnode.elm = nodeOps.createComment(vnode.text)
       insert(parentElm, vnode.elm, refElm)
-    } else {
+    } else { // 文本节点
       vnode.elm = nodeOps.createTextNode(vnode.text)
       insert(parentElm, vnode.elm, refElm)
     }
@@ -358,6 +359,7 @@ export function createPatchFunction (backend) {
     }
   }
 
+  // 删除一组节点，从 startIdx 到 endIdx 的节点
   function removeVnodes (vnodes, startIdx, endIdx) {
     for (; startIdx <= endIdx; ++startIdx) {
       const ch = vnodes[startIdx]
@@ -498,6 +500,7 @@ export function createPatchFunction (backend) {
     }
   }
 
+  // 更新节点
   function patchVnode (
     oldVnode,
     vnode,
@@ -551,21 +554,21 @@ export function createPatchFunction (backend) {
       for (i = 0; i < cbs.update.length; ++i) cbs.update[i](oldVnode, vnode)
       if (isDef(i = data.hook) && isDef(i = i.update)) i(oldVnode, vnode)
     }
-    if (isUndef(vnode.text)) {
-      if (isDef(oldCh) && isDef(ch)) {
-        if (oldCh !== ch) updateChildren(elm, oldCh, ch, insertedVnodeQueue, removeOnly)
-      } else if (isDef(ch)) {
+    if (isUndef(vnode.text)) { // 新节点不为文本节点时
+      if (isDef(oldCh) && isDef(ch)) { // 新旧节点都有子节点时
+        if (oldCh !== ch) updateChildren(elm, oldCh, ch, insertedVnodeQueue, removeOnly) // 更新子节点
+      } else if (isDef(ch)) { // 旧节点没有子节点，新节点有子节点时
         if (process.env.NODE_ENV !== 'production') {
           checkDuplicateKeys(ch)
         }
-        if (isDef(oldVnode.text)) nodeOps.setTextContent(elm, '')
-        addVnodes(elm, null, ch, 0, ch.length - 1, insertedVnodeQueue)
+        if (isDef(oldVnode.text)) nodeOps.setTextContent(elm, '') // 旧节点为文本节点时
+        addVnodes(elm, null, ch, 0, ch.length - 1, insertedVnodeQueue) // 添加节点
       } else if (isDef(oldCh)) {
-        removeVnodes(oldCh, 0, oldCh.length - 1)
-      } else if (isDef(oldVnode.text)) {
+        removeVnodes(oldCh, 0, oldCh.length - 1) // 删除所有子节点
+      } else if (isDef(oldVnode.text)) { // 旧节点为文本节点，新节点不为文本节点时
         nodeOps.setTextContent(elm, '')
       }
-    } else if (oldVnode.text !== vnode.text) {
+    } else if (oldVnode.text !== vnode.text) { // 新节点为文本节点且前后文本不相同时
       nodeOps.setTextContent(elm, vnode.text)
     }
     if (isDef(data)) {

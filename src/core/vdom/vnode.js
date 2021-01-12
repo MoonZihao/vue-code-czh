@@ -2,7 +2,7 @@
 
 // 描述一个节点，表示一个真实的dom元素
 export default class VNode {
-  tag: string | void; // 标签名
+  tag: string | void; // 标签名，判断是否元素节点
   data: VNodeData | void; // 节点属性
   children: ?Array<VNode>; // 子节点列表
   text: string | void; // 文本节点的文本
