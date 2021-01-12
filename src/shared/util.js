@@ -67,6 +67,7 @@ export function isRegExp (v: any): boolean {
 /**
  * Check if val is a valid array index.
  */
+// 判断 key 是否为一个有效的索引值
 export function isValidArrayIndex (val: any): boolean {
   const n = parseFloat(String(val))
   return n >= 0 && Math.floor(n) === n && isFinite(val)

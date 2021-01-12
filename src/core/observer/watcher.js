@@ -23,7 +23,10 @@ let uid = 0
  * and fires callback when the expression value changes.
  * This is used for both the $watch() api and directives.
  */
-// 订阅者Watcher，当前收集的依赖
+/**
+ * 订阅者Watcher，当前收集的依赖
+ * vue2.0采用中等粒度，每个组件对应一个watcher对象
+*/
 export default class Watcher {
   vm: Component;
   expression: string;
@@ -114,6 +117,7 @@ export default class Watcher {
     } finally {
       // "touch" every property so they are all tracked as
       // dependencies for deep watching
+      // 深度监听
       if (this.deep) {
         traverse(value)
       }

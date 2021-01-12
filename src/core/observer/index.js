@@ -206,12 +206,14 @@ export function defineReactive (
  * triggers change notification if the property doesn't
  * already exist.
  */
+// target不能为vue实例或根数据对象（this.$data）
 export function set (target: Array<any> | Object, key: any, val: any): any {
   if (process.env.NODE_ENV !== 'production' &&
     (isUndef(target) || isPrimitive(target))
   ) {
     warn(`Cannot set reactive property on undefined, null, or primitive value: ${(target: any)}`)
   }
+  // 为一个array且key是一个有效的索引值
   if (Array.isArray(target) && isValidArrayIndex(key)) {
     target.length = Math.max(target.length, key)
     target.splice(key, 1, val)
@@ -222,6 +224,8 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
     return val
   }
   const ob = (target: any).__ob__
+
+  // 判断是否为vue实例或者根数据对象
   if (target._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid adding reactive properties to a Vue instance or its root $data ' +
@@ -229,28 +233,33 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
     )
     return val
   }
+  // 没有ob代表不为响应式，target不为响应式时不做处理
   if (!ob) {
     target[key] = val
     return val
   }
   defineReactive(ob.value, key, val)
-  ob.dep.notify()
+  ob.dep.notify() // 触发视图刷新
   return val
 }
 
 /**
  * Delete a property and trigger change if necessary.
  */
+// target不能为vue实例或根数据对象（this.$data）
 export function del (target: Array<any> | Object, key: any) {
   if (process.env.NODE_ENV !== 'production' &&
     (isUndef(target) || isPrimitive(target))
   ) {
     warn(`Cannot delete reactive property on undefined, null, or primitive value: ${(target: any)}`)
   }
+  // 为一个array且key是一个有效的索引值
   if (Array.isArray(target) && isValidArrayIndex(key)) {
     target.splice(key, 1)
     return
   }
+
+  // 判断是否为vue实例或者根数据对象
   const ob = (target: any).__ob__
   if (target._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== 'production' && warn(
@@ -259,14 +268,16 @@ export function del (target: Array<any> | Object, key: any) {
     )
     return
   }
+  // 不存在属性
   if (!hasOwn(target, key)) {
     return
   }
   delete target[key]
+  // 没有ob代表不为响应式，target不为响应式时不做处理
   if (!ob) {
     return
   }
-  ob.dep.notify()
+  ob.dep.notify() // 触发视图刷新
 }
 
 /**
