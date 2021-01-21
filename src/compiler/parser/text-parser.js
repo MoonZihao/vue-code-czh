@@ -17,6 +17,10 @@ type TextParseResult = {
   tokens: Array<string | { '@binding': string }>
 }
 
+/**
+ *@Des: 文本解析器
+ *@param { text } 文本内容
+*/
 export function parseText (
   text: string,
   delimiters?: [string, string]

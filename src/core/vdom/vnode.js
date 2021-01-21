@@ -16,7 +16,7 @@ export default class VNode {
 
   // strictly internal
   raw: boolean; // contains raw HTML? (server only)
-  isStatic: boolean; // hoisted static node
+  isStatic: boolean; // 是否为静态节点
   isRootInsert: boolean; // necessary for enter transition check
   isComment: boolean; // 是否为注释节点
   isCloned: boolean; // 是否为克隆节点

@@ -18,13 +18,14 @@ const genStaticKeysCached = cached(genStaticKeys)
  *    create fresh nodes for them on each re-render;
  * 2. Completely skip them in the patching process.
  */
+// 优化器 标记静态节点
 export function optimize (root: ?ASTElement, options: CompilerOptions) {
   if (!root) return
   isStaticKey = genStaticKeysCached(options.staticKeys || '')
   isPlatformReservedTag = options.isReservedTag || no
-  // first pass: mark all non-static nodes.
+  // 第一步：标记所有静态节点（不会发生变化的节点）
   markStatic(root)
-  // second pass: mark static roots.
+  // 第二步：标记所有静态根节点（自身是静态节点，所有子节点都是静态节点，不能只有一个纯文本节点，父级是动态节点）
   markStaticRoots(root, false)
 }
 
@@ -35,6 +36,7 @@ function genStaticKeys (keys: string): Function {
   )
 }
 
+// 递归遍历 标记所有静态节点
 function markStatic (node: ASTNode) {
   node.static = isStatic(node)
   if (node.type === 1) {
@@ -51,6 +53,8 @@ function markStatic (node: ASTNode) {
     for (let i = 0, l = node.children.length; i < l; i++) {
       const child = node.children[i]
       markStatic(child)
+
+      // 重新校验当前节点的标记是否准确（解决父节点被标记为静态节点，子节点被标记为动态节点的问题）
       if (!child.static) {
         node.static = false
       }
@@ -67,6 +71,7 @@ function markStatic (node: ASTNode) {
   }
 }
 
+// 递归遍历 标记所有静态根节点
 function markStaticRoots (node: ASTNode, isInFor: boolean) {
   if (node.type === 1) {
     if (node.static || node.once) {
@@ -97,20 +102,23 @@ function markStaticRoots (node: ASTNode, isInFor: boolean) {
   }
 }
 
+// 节点是否为静态节点
 function isStatic (node: ASTNode): boolean {
-  if (node.type === 2) { // expression
+  if (node.type === 2) { // 带变量的动态文本节点
     return false
   }
-  if (node.type === 3) { // text
+  if (node.type === 3) { // 不带变量的纯文本节点
     return true
   }
-  return !!(node.pre || (
-    !node.hasBindings && // no dynamic bindings
-    !node.if && !node.for && // not v-if or v-for or v-else
-    !isBuiltInTag(node.tag) && // not a built-in
-    isPlatformReservedTag(node.tag) && // not a component
-    !isDirectChildOfTemplateFor(node) &&
-    Object.keys(node).every(isStaticKey)
+
+  // 元素节点
+  return !!(node.pre || ( // 如果使用了指令v-pre 则直接为静态节点
+    !node.hasBindings && // 没有动态绑定（不能有v-、@、:）
+    !node.if && !node.for && // 没有 v-if v-for v-else
+    !isBuiltInTag(node.tag) && // 不是内置标签（标签名不能是slot或者component）
+    isPlatformReservedTag(node.tag) && // 不是组件
+    !isDirectChildOfTemplateFor(node) && // 父节点不能是带v-for指令的template标签
+    Object.keys(node).every(isStaticKey) // 节点中不存在动态节点才有的属性
   ))
 }
 

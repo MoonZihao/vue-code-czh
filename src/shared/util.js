@@ -119,9 +119,7 @@ export function makeMap (
     : val => map[val]
 }
 
-/**
- * Check if a tag is a built-in tag.
- */
+// 判断是否内置标签（标签名是slot或者component）
 export const isBuiltInTag = makeMap('slot,component', true)
 
 /**

@@ -18,13 +18,13 @@ const attribute = /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s
 const dynamicArgAttribute = /^\s*((?:v-[\w-]+:|@|:|#)\[[^=]+?\][^\s"'<>\/=]*)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/
 const ncname = `[a-zA-Z_][\\-\\.0-9_a-zA-Z${unicodeRegExp.source}]*`
 const qnameCapture = `((?:${ncname}\\:)?${ncname})`
-const startTagOpen = new RegExp(`^<${qnameCapture}`)
-const startTagClose = /^\s*(\/?)>/
-const endTag = new RegExp(`^<\\/${qnameCapture}[^>]*>`)
-const doctype = /^<!DOCTYPE [^>]+>/i
+const startTagOpen = new RegExp(`^<${qnameCapture}`) // 判断是否开始标签开头
+const startTagClose = /^\s*(\/?)>/ // 判断是否开始标签自闭合标签开头
+const endTag = new RegExp(`^<\\/${qnameCapture}[^>]*>`) // 判断是否结束标签开头
+const doctype = /^<!DOCTYPE [^>]+>/i // 判断doctype标签开头
 // #7298: escape - to avoid being passed as HTML comment when inlined in page
-const comment = /^<!\--/
-const conditionalComment = /^<!\[/
+const comment = /^<!\--/ // 判断注释标签开头
+const conditionalComment = /^<!\[/ // 判断条件注释标签开头
 
 // Special Elements (can contain anything)
 export const isPlainTextElement = makeMap('script,style,textarea', true)
@@ -51,20 +51,28 @@ function decodeAttr (value, shouldDecodeNewlines) {
   return value.replace(re, match => decodingMap[match])
 }
 
+/**
+ *@date: 2021-01-19 18:01:59
+ *@Des: HTML解析器
+ *@param { html } HTML模板字符串
+*/
 export function parseHTML (html, options) {
   const stack = []
   const expectHTML = options.expectHTML
   const isUnaryTag = options.isUnaryTag || no
   const canBeLeftOpenTag = options.canBeLeftOpenTag || no
   let index = 0
-  let last, lastTag
+  let last, lastTag // 父元素
+  // 循环截取HTML模板字符串 解析HTML模板
   while (html) {
     last = html
     // Make sure we're not in a plaintext content element like script/style
-    if (!lastTag || !isPlainTextElement(lastTag)) {
+    if (!lastTag || !isPlainTextElement(lastTag)) { // 父元素为正常元素
       let textEnd = html.indexOf('<')
+
+      // 为一个标签开头 标签类型不确定（开始标签/结束标签/注释标签）
       if (textEnd === 0) {
-        // Comment:
+        // 注释标签
         if (comment.test(html)) {
           const commentEnd = html.indexOf('-->')
 
@@ -78,6 +86,7 @@ export function parseHTML (html, options) {
         }
 
         // http://en.wikipedia.org/wiki/Conditional_comment#Downlevel-revealed_conditional_comment
+        // 条件注释标签
         if (conditionalComment.test(html)) {
           const conditionalEnd = html.indexOf(']>')
 
@@ -87,14 +96,14 @@ export function parseHTML (html, options) {
           }
         }
 
-        // Doctype:
+        // Doctype标签
         const doctypeMatch = html.match(doctype)
         if (doctypeMatch) {
           advance(doctypeMatch[0].length)
           continue
         }
 
-        // End tag:
+        // 结束标签
         const endTagMatch = html.match(endTag)
         if (endTagMatch) {
           const curIndex = index
@@ -103,7 +112,7 @@ export function parseHTML (html, options) {
           continue
         }
 
-        // Start tag:
+        // 开始标签
         const startTagMatch = parseStartTag()
         if (startTagMatch) {
           handleStartTag(startTagMatch)
@@ -114,6 +123,7 @@ export function parseHTML (html, options) {
         }
       }
 
+      // 为一个文本开头
       let text, rest, next
       if (textEnd >= 0) {
         rest = html.slice(textEnd)
@@ -123,7 +133,7 @@ export function parseHTML (html, options) {
           !comment.test(rest) &&
           !conditionalComment.test(rest)
         ) {
-          // < in plain text, be forgiving and treat it as text
+          // 判断“<”在文本中的情况
           next = rest.indexOf('<', 1)
           if (next < 0) break
           textEnd += next
@@ -132,6 +142,7 @@ export function parseHTML (html, options) {
         text = html.substring(0, textEnd)
       }
 
+      // 如果模板中找不到<，就说明整个模板都是文本
       if (textEnd < 0) {
         text = html
       }
@@ -140,10 +151,11 @@ export function parseHTML (html, options) {
         advance(text.length)
       }
 
+      // 触发钩子函数
       if (options.chars && text) {
         options.chars(text, index - text.length, index)
       }
-    } else {
+    } else { // 父元素为script、style、textarea
       let endTagLength = 0
       const stackedTag = lastTag.toLowerCase()
       const reStackedTag = reCache[stackedTag] || (reCache[stackedTag] = new RegExp('([\\s\\S]*?)(</' + stackedTag + '[^>]*>)', 'i'))

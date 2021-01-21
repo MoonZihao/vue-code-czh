@@ -97,7 +97,7 @@ declare type ASTDirective = {
 declare type ASTNode = ASTElement | ASTText | ASTExpression;
 
 declare type ASTElement = {
-  type: 1;
+  type: 1; // 1元素节点 2带变量的动态文本节点 3不带变量的纯文本节点
   tag: string;
   attrsList: Array<ASTAttr>;
   attrsMap: { [key: string]: any };

@@ -94,7 +94,7 @@ export function parse (
 
   delimiters = options.delimiters
 
-  const stack = []
+  const stack = [] // AST节点栈
   const preserveWhitespace = options.preserveWhitespace !== false
   const whitespaceOption = options.whitespace
   let root
@@ -210,6 +210,15 @@ export function parse (
     shouldDecodeNewlinesForHref: options.shouldDecodeNewlinesForHref,
     shouldKeepComment: options.comments,
     outputSourceRange: options.outputSourceRange,
+
+    /**
+     *@Des: 解析到标签开始时触发
+     *@param { tag } 标签名
+     *@param { attrs } 属性列表
+     *@param { unary } 是否自闭合标签，例如input
+     *@param { start } 开始位置下标
+     *@param { end } 结束位置下标
+    */
     start (tag, attrs, unary, start, end) {
       // check namespace.
       // inherit parent ns if there is one
@@ -221,6 +230,7 @@ export function parse (
         attrs = guardIESVGBug(attrs)
       }
 
+      // 创建AST
       let element: ASTElement = createASTElement(tag, attrs, currentParent)
       if (ns) {
         element.ns = ns
@@ -297,6 +307,7 @@ export function parse (
       }
     },
 
+    // 解析到标签结束时触发
     end (tag, start, end) {
       const element = stack[stack.length - 1]
       // pop stack
@@ -308,6 +319,7 @@ export function parse (
       closeElement(element)
     },
 
+    // 解析到文本时触发
     chars (text: string, start: number, end: number) {
       if (!currentParent) {
         if (process.env.NODE_ENV !== 'production') {
@@ -379,6 +391,7 @@ export function parse (
         }
       }
     },
+    // 解析到注释时触发
     comment (text: string, start, end) {
       // adding anything as a sibling to the root node is forbidden
       // comments should still be allowed, but ignored
