@@ -120,7 +120,7 @@ declare type ASTElement = {
   attrs?: Array<ASTAttr>;
   dynamicAttrs?: Array<ASTAttr>;
   props?: Array<ASTAttr>;
-  plain?: boolean;
+  plain?: boolean; // 是否没有属性
   pre?: true;
   ns?: string;
 

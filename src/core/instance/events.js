@@ -10,7 +10,7 @@ import {
 import { updateListeners } from '../vdom/helpers/index'
 
 export function initEvents (vm: Component) {
-  vm._events = Object.create(null)
+  vm._events = Object.create(null) // 创建存储事件列表对象
   vm._hasHookEvent = false
   // init parent attached events
   const listeners = vm.$options._parentListeners
@@ -51,14 +51,16 @@ export function updateComponentListeners (
 
 export function eventsMixin (Vue: Class<Component>) {
   const hookRE = /^hook:/
+
+  // 监听当前实例上的自定义事件
   Vue.prototype.$on = function (event: string | Array<string>, fn: Function): Component {
     const vm: Component = this
-    if (Array.isArray(event)) {
+    if (Array.isArray(event)) { // event为数组时递归每一项调用$on
       for (let i = 0, l = event.length; i < l; i++) {
         vm.$on(event[i], fn)
       }
     } else {
-      (vm._events[event] || (vm._events[event] = [])).push(fn)
+      (vm._events[event] || (vm._events[event] = [])).push(fn) // 回调添加到事件列表，_events在_init方法创建
       // optimize hook:event cost by using a boolean flag marked at registration
       // instead of a hash lookup
       if (hookRE.test(event)) {
@@ -68,41 +70,45 @@ export function eventsMixin (Vue: Class<Component>) {
     return vm
   }
 
+  // 监听当前实例上的自定义事件，只触发一次
   Vue.prototype.$once = function (event: string, fn: Function): Component {
     const vm: Component = this
     function on () {
-      vm.$off(event, on)
-      fn.apply(vm, arguments)
+      vm.$off(event, on) // 第一次触发之后移除监听器
+      fn.apply(vm, arguments) // 执行回调
     }
     on.fn = fn
     vm.$on(event, on)
     return vm
   }
 
+  // 移除当前实例上的自定义事件
   Vue.prototype.$off = function (event?: string | Array<string>, fn?: Function): Component {
     const vm: Component = this
-    // all
+    // 没传参时移除所有事件监听器
     if (!arguments.length) {
       vm._events = Object.create(null)
       return vm
     }
-    // array of events
+    // event为数组时递归每一项调用$off
     if (Array.isArray(event)) {
       for (let i = 0, l = event.length; i < l; i++) {
         vm.$off(event[i], fn)
       }
       return vm
     }
-    // specific event
     const cbs = vm._events[event]
+
+    // 没有监听器时直接返回
     if (!cbs) {
       return vm
     }
+    // 移除当前事件所有监听器
     if (!fn) {
       vm._events[event] = null
       return vm
     }
-    // specific handler
+    // 移除当前事件对应监听器
     let cb
     let i = cbs.length
     while (i--) {

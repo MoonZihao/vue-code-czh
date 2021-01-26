@@ -95,6 +95,7 @@ declare interface Component {
   // createElement
 
   // _c is internal that accepts `normalizationType` optimization hint
+  // 元素节点
   _c: (
     vnode?: VNode,
     data?: VNodeData,
@@ -108,11 +109,11 @@ declare interface Component {
   _o: (vnode: VNode | Array<VNode>, index: number, key: string) => VNode | VNodeChildren;
   // toString
   _s: (value: mixed) => string;
-  // text to VNode
+  // 文本节点
   _v: (value: string | number) => VNode;
   // toNumber
   _n: (value: string) => number | string;
-  // empty vnode
+  // 注释节点
   _e: () => VNode;
   // loose equal
   _q: (a: mixed, b: mixed) => boolean;

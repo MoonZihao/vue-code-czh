@@ -52,6 +52,7 @@ export function generate (
   }
 }
 
+// 递归 生成元素节点代码字符串
 export function genElement (el: ASTElement, state: CodegenState): string {
   if (el.parent) {
     el.pre = el.pre || el.parent.pre
@@ -532,6 +533,7 @@ function genNode (node: ASTNode, state: CodegenState): string {
   }
 }
 
+// 生成文本节点代码字符串
 export function genText (text: ASTText | ASTExpression): string {
   return `_v(${text.type === 2
     ? text.expression // no need for () because already wrapped in _s()
@@ -539,6 +541,7 @@ export function genText (text: ASTText | ASTExpression): string {
   })`
 }
 
+// 生成注释节点代码字符串
 export function genComment (comment: ASTText): string {
   return `_e(${JSON.stringify(comment.text)})`
 }
