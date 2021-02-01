@@ -13,14 +13,16 @@ export function handleError (err: Error, vm: any, info: string) {
   try {
     if (vm) {
       let cur = vm
-      while ((cur = cur.$parent)) {
-        const hooks = cur.$options.errorCaptured
+      while ((cur = cur.$parent)) { // 循环逐步向父组件反馈错误
+        const hooks = cur.$options.errorCaptured // 获取父组件errorCaptured钩子函数
         if (hooks) {
           for (let i = 0; i < hooks.length; i++) {
             try {
+               // 当errorCaptured返回false时，直接return，阻止错误继续向父组件传播
               const capture = hooks[i].call(cur, err, vm, info) === false
               if (capture) return
             } catch (e) {
+              // errorCaptured钩子函数报错时走这里
               globalHandleError(e, cur, 'errorCaptured hook')
             }
           }
@@ -56,20 +58,20 @@ export function invokeWithErrorHandling (
 }
 
 function globalHandleError (err, vm, info) {
-  if (config.errorHandler) {
+  if (config.errorHandler) { // 存在Vue.config.errorHandler时直接执行
     try {
       return config.errorHandler.call(null, err, vm, info)
     } catch (e) {
-      // if the user intentionally throws the original error in the handler,
-      // do not log it twice
+      // config.errorHandler钩子函数报错时走这里
       if (e !== err) {
-        logError(e, null, 'config.errorHandler')
+        logError(e, null, 'config.errorHandler') // 打印报错
       }
     }
   }
-  logError(err, vm, info)
+  logError(err, vm, info) // 打印报错
 }
 
+// 打印报错
 function logError (err, vm, info) {
   if (process.env.NODE_ENV !== 'production') {
     warn(`Error in ${info}: "${err.toString()}"`, vm)

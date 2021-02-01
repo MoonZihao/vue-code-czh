@@ -28,7 +28,7 @@ export function initMixin (Vue: Class<Component>) {
 
     // a flag to avoid this being observed
     vm._isVue = true
-    // merge options
+    // 合并options
     if (options && options._isComponent) {
       // 为组件时
       // optimize internal component instantiation
@@ -51,8 +51,8 @@ export function initMixin (Vue: Class<Component>) {
     }
     // expose real self
     vm._self = vm
-    initLifecycle(vm)
-    initEvents(vm)
+    initLifecycle(vm) // 初始化实例属性
+    initEvents(vm) // 初始化事件
     initRender(vm)
     callHook(vm, 'beforeCreate')
     initInjections(vm) // resolve injections before data/props
@@ -67,6 +67,8 @@ export function initMixin (Vue: Class<Component>) {
       measure(`vue ${vm._name} init`, startTag, endTag)
     }
 
+    // 有传el参数时，走模板编译阶段和挂载阶段
+    // 没有传el参数时，不进行下一个生命周期流程，等待主动执行vm.$mount方法
     if (vm.$options.el) {
       vm.$mount(vm.$options.el)
     }
@@ -92,6 +94,7 @@ export function initInternalComponent (vm: Component, options: InternalComponent
   }
 }
 
+// 获取当前实例中构造函数的options选项及其所有所有父级构造函数的options
 export function resolveConstructorOptions (Ctor: Class<Component>) {
   let options = Ctor.options
   if (Ctor.super) {

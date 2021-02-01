@@ -6,12 +6,13 @@ import { lifecycleMixin } from './lifecycle'
 import { warn } from '../util/index'
 
 function Vue (options) {
+  // 必须使用new来调用Vue，保证不会被当作普通函数调用
   if (process.env.NODE_ENV !== 'production' &&
     !(this instanceof Vue)
   ) {
     warn('Vue is a constructor and should be called with the `new` keyword')
   }
-  this._init(options)
+  this._init(options) // 执行生命周期初始化流程
 }
 
 initMixin(Vue) // 初始化

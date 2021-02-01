@@ -50,6 +50,7 @@ export function createFnInvoker (fns: Function | Array<Function>, vm: ?Component
   return invoker
 }
 
+// 对比listenners和oldListeners的不同，
 export function updateListeners (
   on: Object,
   oldOn: Object,

@@ -29,20 +29,21 @@ export function setActiveInstance(vm: Component) {
   }
 }
 
+// 初始化实例属性，向实例挂载属性
 export function initLifecycle (vm: Component) {
   const options = vm.$options
 
-  // locate first non-abstract parent
+  // 找出第一个非抽象父类
   let parent = options.parent
   if (parent && !options.abstract) {
     while (parent.$options.abstract && parent.$parent) {
       parent = parent.$parent
     }
-    parent.$children.push(vm)
+    parent.$children.push(vm) // 子组件主动添加到父组件实例
   }
 
   vm.$parent = parent
-  vm.$root = parent ? parent.$root : vm
+  vm.$root = parent ? parent.$root : vm // 当前组件的根实例，没有父组件，则为自身
 
   vm.$children = []
   vm.$refs = {}
@@ -87,13 +88,16 @@ export function lifecycleMixin (Vue: Class<Component>) {
     // updated in a parent's updated hook.
   }
 
+  // 使当前实例重新渲染
   Vue.prototype.$forceUpdate = function () {
     const vm: Component = this
+    // 每个实例对应一个watcher，执行update
     if (vm._watcher) {
       vm._watcher.update()
     }
   }
 
+  // 销毁当前实例
   Vue.prototype.$destroy = function () {
     const vm: Component = this
     if (vm._isBeingDestroyed) {
@@ -333,10 +337,15 @@ export function deactivateChildComponent (vm: Component, direct?: boolean) {
   }
 }
 
+/**
+ *@Des: 触发生命周期钩子
+ *@param { vm } 当前实例
+ *@param { hook } 钩子类型名称
+*/
 export function callHook (vm: Component, hook: string) {
   // #7573 disable dep collection when invoking lifecycle hooks
   pushTarget()
-  const handlers = vm.$options[hook]
+  const handlers = vm.$options[hook] // 获取当前生命周期钩子，为一个数组，原因是mixin混入存在同一个生命周期钩子时，需要全部触发
   const info = `${hook} hook`
   if (handlers) {
     for (let i = 0, j = handlers.length; i < j; i++) {

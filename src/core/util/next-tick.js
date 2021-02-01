@@ -7,9 +7,10 @@ import { isIE, isIOS, isNative } from './env'
 
 export let isUsingMicroTask = false
 
-const callbacks = []
-let pending = false
+const callbacks = [] // 存储注册的回调
+let pending = false // 是否已经向任务队列中添加了一个任务，确保只会添加一个任务
 
+// 执行任务队列中所有回调
 function flushCallbacks () {
   pending = false
   const copies = callbacks.slice(0)
@@ -40,6 +41,7 @@ let timerFunc
 // Promise is available, we will use it:
 /* istanbul ignore next, $flow-disable-line */
 if (typeof Promise !== 'undefined' && isNative(Promise)) {
+  // 支持使用promise时，注册为微任务promise.then()
   const p = Promise.resolve()
   timerFunc = () => {
     p.then(flushCallbacks)
@@ -71,14 +73,14 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
   }
   isUsingMicroTask = true
 } else if (typeof setImmediate !== 'undefined' && isNative(setImmediate)) {
-  // Fallback to setImmediate.
+  // 支持使用setImmediate时，注册为宏任务setImmediate
   // Technically it leverages the (macro) task queue,
   // but it is still a better choice than setTimeout.
   timerFunc = () => {
     setImmediate(flushCallbacks)
   }
 } else {
-  // Fallback to setTimeout.
+  // 注册为宏任务setTimeout
   timerFunc = () => {
     setTimeout(flushCallbacks, 0)
   }
@@ -86,6 +88,7 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
 
 export function nextTick (cb?: Function, ctx?: Object) {
   let _resolve
+  // 回调添加到任务队列
   callbacks.push(() => {
     if (cb) {
       try {
@@ -97,8 +100,8 @@ export function nextTick (cb?: Function, ctx?: Object) {
       _resolve(ctx)
     }
   })
-  if (!pending) {
-    pending = true
+  if (!pending) { // 确保只会添加一个任务
+    pending = true // 标记任务队列中已经添加了一个任务
     timerFunc()
   }
   // $flow-disable-line

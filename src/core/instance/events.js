@@ -12,7 +12,7 @@ import { updateListeners } from '../vdom/helpers/index'
 export function initEvents (vm: Component) {
   vm._events = Object.create(null) // 创建存储事件列表对象
   vm._hasHookEvent = false
-  // init parent attached events
+  // 初始化父组件附加的事件
   const listeners = vm.$options._parentListeners
   if (listeners) {
     updateComponentListeners(vm, listeners)
@@ -21,10 +21,12 @@ export function initEvents (vm: Component) {
 
 let target: any
 
+// 新增事件
 function add (event, fn) {
   target.$on(event, fn)
 }
 
+// 删除事件
 function remove (event, fn) {
   target.$off(event, fn)
 }
@@ -121,6 +123,7 @@ export function eventsMixin (Vue: Class<Component>) {
     return vm
   }
 
+  // 触发当前实例上的事件
   Vue.prototype.$emit = function (event: string): Component {
     const vm: Component = this
     if (process.env.NODE_ENV !== 'production') {
