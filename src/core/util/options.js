@@ -291,30 +291,27 @@ export function validateComponentName (name: string) {
   }
 }
 
-/**
- * Ensure all props option syntax are normalized into the
- * Object-based format.
- */
+// 规格化props为对象的格式
 function normalizeProps (options: Object, vm: ?Component) {
   const props = options.props
   if (!props) return
-  const res = {}
+  const res = {} // 保存规格化后的结果
   let i, val, name
-  if (Array.isArray(props)) {
+  if (Array.isArray(props)) { // props为数组时
     i = props.length
     while (i--) {
       val = props[i]
       if (typeof val === 'string') {
-        name = camelize(val)
+        name = camelize(val) // 驼峰化
         res[name] = { type: null }
       } else if (process.env.NODE_ENV !== 'production') {
         warn('props must be strings when using array syntax.')
       }
     }
-  } else if (isPlainObject(props)) {
+  } else if (isPlainObject(props)) { // props为对象时
     for (const key in props) {
       val = props[key]
-      name = camelize(key)
+      name = camelize(key) // 驼峰化
       res[name] = isPlainObject(val)
         ? val
         : { type: val }
@@ -329,9 +326,7 @@ function normalizeProps (options: Object, vm: ?Component) {
   options.props = res
 }
 
-/**
- * Normalize all injections into Object-based format
- */
+// 规格化inject为对象的格式
 function normalizeInject (options: Object, vm: ?Component) {
   const inject = options.inject
   if (!inject) return
@@ -398,8 +393,8 @@ export function mergeOptions (
     child = child.options
   }
 
-  normalizeProps(child, vm)
-  normalizeInject(child, vm)
+  normalizeProps(child, vm) // 规格化props
+  normalizeInject(child, vm) // 规格化inject
   normalizeDirectives(child)
 
   // Apply extends and mixins on the child options,

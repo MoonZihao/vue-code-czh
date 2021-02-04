@@ -36,7 +36,7 @@ export default class Watcher {
   user: boolean;
   lazy: boolean;
   sync: boolean;
-  dirty: boolean;
+  dirty: boolean; // 是否需要重新计算computed返回值
   active: boolean;
   deps: Array<Dep>;
   newDeps: Array<Dep>;

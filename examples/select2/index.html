@@ -24,53 +24,29 @@
         {{ item.message }}
       </div>
       <div @click="add">add</div>
+      <select2 :options="items" :aaa="items">
+      </select2>
     </div>
 
     <!-- using string template here to work around HTML <option> placement restriction -->
     <script type="text/x-template" id="demo-template">
       <div>
-        <!-- <p>Selected: {{ selected }}</p> -->
-        <!-- <select2 :options="options" v-model="selected">
-          <option disabled value="0">Select one</option>
-        </select2> -->
+        <select2 :options="items">
+        </select2>
       </div>
     </script>
 
     <script type="text/x-template" id="select2-template">
-      <select>
-        <slot></slot>
-      </select>
+      <div>{{options}}</div>
     </script>
 
     <script>
-    // Vue.component('select2', {
-    //   props: ['options', 'value'],
-    //   template: '#select2-template',
-    //   mounted: function () {
-    //     var vm = this
-    //     $(this.$el)
-    //       .val(this.value)
-    //       // init select2
-    //       .select2({ data: this.options })
-    //       // emit event on change.
-    //       .on('change', function () {
-    //         vm.$emit('input', this.value)
-    //       })
-    //   },
-    //   watch: {
-    //     value: function (value) {
-    //       // update value
-    //       $(this.$el).val(value).trigger('change')
-    //     },
-    //     options: function (options) {
-    //       // update options
-    //       $(this.$el).select2({ data: options })
-    //     }
-    //   },
-    //   destroyed: function () {
-    //     $(this.$el).off().select2('destroy')
-    //   }
-    // })
+    Vue.component('select2', {
+      props: ['options', 'value'],
+      template: '#select2-template',
+      mounted: function () {
+      }
+    })
 
     var vm = new Vue({
       el: '#el',
@@ -80,6 +56,14 @@
           { message: 'bbb' }
         ]
       },
+      computed: {
+        aaa() {
+          return this.items;
+        },
+        bbb() {
+          return this.items;
+        }
+      },
       methods: {
         add() {
           this.items.push({
@@ -87,6 +71,9 @@
           })
           console.log("add");
         }
+      },
+      mounted() {
+        console.log(this.items);
       }
     })
     </script>

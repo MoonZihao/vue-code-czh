@@ -13,10 +13,11 @@ export function initProvide (vm: Component) {
   }
 }
 
+// 初始化inject
 export function initInjections (vm: Component) {
   const result = resolveInject(vm.$options.inject, vm)
   if (result) {
-    toggleObserving(false)
+    toggleObserving(false) // 通知defineReactive不要将内容转换为响应式
     Object.keys(result).forEach(key => {
       /* istanbul ignore else */
       if (process.env.NODE_ENV !== 'production') {
@@ -36,6 +37,7 @@ export function initInjections (vm: Component) {
   }
 }
 
+// 通过用户配置的inject，自底向上搜索注入内容
 export function resolveInject (inject: any, vm: Component): ?Object {
   if (inject) {
     // inject is :any because flow is not smart enough to figure out cached
@@ -50,7 +52,7 @@ export function resolveInject (inject: any, vm: Component): ?Object {
       if (key === '__ob__') continue
       const provideKey = inject[key].from
       let source = vm
-      while (source) {
+      while (source) { // 循环自下向上从父组件获取provide
         if (source._provided && hasOwn(source._provided, provideKey)) {
           result[key] = source._provided[provideKey]
           break
@@ -58,7 +60,7 @@ export function resolveInject (inject: any, vm: Component): ?Object {
         source = source.$parent
       }
       if (!source) {
-        if ('default' in inject[key]) {
+        if ('default' in inject[key]) { // 设置默认值
           const provideDefault = inject[key].default
           result[key] = typeof provideDefault === 'function'
             ? provideDefault.call(vm)

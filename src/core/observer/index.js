@@ -22,8 +22,9 @@ const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
  * In some cases we may want to disable observation inside a component's
  * update computation.
  */
-export let shouldObserve: boolean = true
+export let shouldObserve: boolean = true // 是否需要将内容转换为响应式
 
+// 设置是否需要将内容转换为响应式
 export function toggleObserving (value: boolean) {
   shouldObserve = value
 }
@@ -111,6 +112,7 @@ function copyAugment (target: Object, src: Object, keys: Array<string>) {
  * returns the new observer if successfully observed,
  * or the existing observer if the value already has one.
  */
+// 将数据转换为响应式的
 export function observe (value: any, asRootData: ?boolean): Observer | void {
 
   // 不为object时结束

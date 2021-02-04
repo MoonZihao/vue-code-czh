@@ -11,6 +11,7 @@ import {
   isPlainObject
 } from 'shared/util'
 
+// 事件修饰符处理
 const normalizeEvent = cached((name: string): {
   name: string,
   once: boolean,
@@ -52,14 +53,15 @@ export function createFnInvoker (fns: Function | Array<Function>, vm: ?Component
 
 // 对比listenners和oldListeners的不同，
 export function updateListeners (
-  on: Object,
-  oldOn: Object,
+  on: Object, // listenners
+  oldOn: Object, // oldListeners
   add: Function,
   remove: Function,
   createOnceHandler: Function,
   vm: Component
 ) {
   let name, def, cur, old, event
+  // on中存在，oldOn中不存在时，添加事件
   for (name in on) {
     def = cur = on[name]
     old = oldOn[name]
@@ -87,6 +89,7 @@ export function updateListeners (
       on[name] = old
     }
   }
+  // oldOn中存在，on中不存在时，删除事件
   for (name in oldOn) {
     if (isUndef(on[name])) {
       event = normalizeEvent(name)
