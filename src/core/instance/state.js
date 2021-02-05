@@ -28,6 +28,7 @@ import {
   isReservedAttribute
 } from '../util/index'
 
+// 默认属性描述符，与Object.defineProperty配合使用
 const sharedPropertyDefinition = {
   enumerable: true,
   configurable: true,
@@ -170,8 +171,12 @@ export function getData (data: Function, vm: Component): any {
   }
 }
 
-const computedWatcherOptions = { lazy: true }
+const computedWatcherOptions = { lazy: true } // Watcher配置选项
 
+/**
+ *@Des: 初始化computed
+ *@param { computed } computed
+*/
 function initComputed (vm: Component, computed: Object) {
   // $flow-disable-line
   const watchers = vm._computedWatchers = Object.create(null) // 保存所有计算属性的watcher实例
@@ -187,6 +192,7 @@ function initComputed (vm: Component, computed: Object) {
       )
     }
 
+    // 非服务端渲染环境，创建watcher实例
     if (!isSSR) {
       // create internal watcher for the computed property.
       watchers[key] = new Watcher(
@@ -203,37 +209,43 @@ function initComputed (vm: Component, computed: Object) {
     if (!(key in vm)) {
       defineComputed(vm, key, userDef)
     } else if (process.env.NODE_ENV !== 'production') {
-      if (key in vm.$data) {
+      if (key in vm.$data) { // key和data冲突时报错
         warn(`The computed property "${key}" is already defined in data.`, vm)
-      } else if (vm.$options.props && key in vm.$options.props) {
+      } else if (vm.$options.props && key in vm.$options.props) { // key和props冲突时报错
         warn(`The computed property "${key}" is already defined as a prop.`, vm)
       }
     }
   }
 }
 
+/**
+ *@Des: 在对应vm实例上设置一个计算属性
+ *@param { target } vm实例
+ *@param { key } key
+ *@param { userDef } userDef
+*/
 export function defineComputed (
   target: any,
   key: string,
   userDef: Object | Function
 ) {
-  const shouldCache = !isServerRendering()
-  if (typeof userDef === 'function') {
+  const shouldCache = !isServerRendering() // 是否不是服务端渲染，是否应该有缓存
+  if (typeof userDef === 'function') { // computed为函数时
     sharedPropertyDefinition.get = shouldCache
-      ? createComputedGetter(key)
-      : createGetterInvoker(userDef)
+      ? createComputedGetter(key) // 设置成计算属性的getter函数
+      : createGetterInvoker(userDef) // 设置成普通的getter函数
     sharedPropertyDefinition.set = noop
-  } else {
+  } else { // computed为对象时
     sharedPropertyDefinition.get = userDef.get
-      ? shouldCache && userDef.cache !== false
-        ? createComputedGetter(key)
-        : createGetterInvoker(userDef.get)
+      ? shouldCache && userDef.cache !== false // userDef.cache 判断是否使用缓存，vue已弃用
+        ? createComputedGetter(key) // 设置成计算属性的getter函数
+        : createGetterInvoker(userDef.get) // 设置成普通的getter函数
       : noop
     sharedPropertyDefinition.set = userDef.set || noop
   }
   if (process.env.NODE_ENV !== 'production' &&
       sharedPropertyDefinition.set === noop) {
-    sharedPropertyDefinition.set = function () {
+    sharedPropertyDefinition.set = function () { // 为对象形式 但是没有设置setter
       warn(
         `Computed property "${key}" was assigned to but it has no setter.`,
         this
@@ -243,6 +255,7 @@ export function defineComputed (
   Object.defineProperty(target, key, sharedPropertyDefinition)
 }
 
+// 设置成计算属性的getter函数
 function createComputedGetter (key) {
   return function computedGetter () {
     const watcher = this._computedWatchers && this._computedWatchers[key]
@@ -258,6 +271,7 @@ function createComputedGetter (key) {
   }
 }
 
+// 设置成普通的getter函数
 function createGetterInvoker(fn) {
   return function computedGetter () {
     return fn.call(this, this)

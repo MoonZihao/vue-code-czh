@@ -47,7 +47,7 @@ export default class Watcher {
   value: any;
 
   constructor (
-    vm: Component,
+    vm: Component, // 当前实例
     expOrFn: string | Function, // 当前监听对象
     cb: Function, // 回调函数
     options?: ?Object,
