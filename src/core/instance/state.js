@@ -58,7 +58,7 @@ export function initState (vm: Component) {
     observe(vm._data = {}, true /* asRootData */) // 不存在data时观察data空对象
   }
   if (opts.computed) initComputed(vm, opts.computed) // 初始化computed
-  if (opts.watch && opts.watch !== nativeWatch) {
+  if (opts.watch && opts.watch !== nativeWatch) { // 存在watch且watch不等于浏览器原生watch时
     initWatch(vm, opts.watch) // 初始化watch
   }
 }
@@ -260,7 +260,7 @@ function createComputedGetter (key) {
   return function computedGetter () {
     const watcher = this._computedWatchers && this._computedWatchers[key]
     if (watcher) {
-      if (watcher.dirty) {
+      if (watcher.dirty) { // 计算属性返回值有变化
         watcher.evaluate()
       }
       if (Dep.target) {
@@ -310,6 +310,10 @@ function initMethods (vm: Component, methods: Object) {
   }
 }
 
+/**
+ *@Des: 初始化watch
+ *@param { watch } watch
+*/
 function initWatch (vm: Component, watch: Object) {
   for (const key in watch) {
     const handler = watch[key]
@@ -323,6 +327,13 @@ function initWatch (vm: Component, watch: Object) {
   }
 }
 
+/**
+ *@Des: 
+ *@param { vm } 当前实例
+ *@param { expOrFn } 表达式或计算属性函数
+ *@param { handler } watch的值
+ *@param { options } 选项
+*/
 function createWatcher (
   vm: Component,
   expOrFn: string | Function,
@@ -333,7 +344,7 @@ function createWatcher (
     options = handler
     handler = handler.handler
   }
-  if (typeof handler === 'string') {
+  if (typeof handler === 'string') { // 如果handler是字符串，则从vm中取出方法
     handler = vm[handler]
   }
   return vm.$watch(expOrFn, handler, options)

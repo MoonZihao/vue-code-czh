@@ -4,10 +4,11 @@ import { hasOwn } from 'shared/util'
 import { warn, hasSymbol } from '../util/index'
 import { defineReactive, toggleObserving } from '../observer/index'
 
+// 初始化provide
 export function initProvide (vm: Component) {
   const provide = vm.$options.provide
   if (provide) {
-    vm._provided = typeof provide === 'function'
+    vm._provided = typeof provide === 'function' // provide为函数是将返回值赋值给vm._provided，否则直接赋值
       ? provide.call(vm)
       : provide
   }

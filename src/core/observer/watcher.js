@@ -214,13 +214,14 @@ export default class Watcher {
    * This only gets called for lazy watchers.
    */
   evaluate () {
-    this.value = this.get()
+    this.value = this.get() // 重新计算值
     this.dirty = false
   }
 
   /**
    * Depend on all deps collected by this watcher.
    */
+  // 添加依赖
   depend () {
     let i = this.deps.length
     while (i--) {
